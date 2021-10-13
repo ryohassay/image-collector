@@ -1,0 +1,8 @@
+https://pypi.org/project/webdriver-manager/
+https://www.mt-megami.com/article/ubuntu-python3-selenium-googlechrome-scraping
+
+Command line arguments
+https://blog.denet.co.jp/python-command/
+https://qiita.com/petitviolet/items/aad73a24f41315f78ee4
+
+"tbs=isz:l" image size
