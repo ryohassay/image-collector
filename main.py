@@ -11,7 +11,8 @@ from webdriver_manager.firefox import GeckoDriverManager
 from purser import Purser
 
 # ============================== Constants ==============================
-HTML_CLASS = 'rg_i Q4LuWd'
+SELENIUM_CLASS = 'rg_i Q4LuWd'
+REQUESTS_CLASS = 'yWs4tf'
 # ============================== Constants ==============================
 
 
@@ -53,6 +54,12 @@ def main(query: str, browser: str = None, number: int = None, save_dir: str = '.
 	if browser is None:
 		html = requests.get(url).content
 		sleep(5)
+
+		# BeautifulSoupを使ってHTMLを解析
+		soup = BeautifulSoup(html, "html.parser")
+		# imgタグを検索
+		img_tags = soup.find_all("img", class_=REQUESTS_CLASS)
+
 	else:
 		print('Browser: ', browser)
 		# Launch Selemnium driver
@@ -80,11 +87,11 @@ def main(query: str, browser: str = None, number: int = None, save_dir: str = '.
 		driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
 		html = driver.page_source.encode("utf-8")
 	
-	# BeautifulSoupを使ってHTMLを解析
-	soup = BeautifulSoup(html, "html.parser")
+		# BeautifulSoupを使ってHTMLを解析
+		soup = BeautifulSoup(html, "html.parser")
+		# imgタグを検索
+		img_tags = soup.find_all("img", class_=SELENIUM_CLASS)
 
-	# imgタグを検索
-	img_tags = soup.find_all("img", class_=HTML_CLASS)
 	print('\nImages found: {}\n'.format(len(img_tags)))
 
 	img_urls = []
