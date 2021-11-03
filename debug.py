@@ -1,3 +1,5 @@
+# For looking for HTML class name of img tag
+
 import requests
 from time import sleep
 from bs4 import BeautifulSoup
@@ -48,4 +50,6 @@ def main(query: str, browser: str = None, save_dir: str = "./images"):
 	img_tags = soup.find_all("img")
 	print(img_tags)
 
-	
+
+if __name__ == '__main__':
+	main('twice mina', 'firefox')
