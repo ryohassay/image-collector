@@ -52,4 +52,4 @@ def main(query: str, browser: str = None, save_dir: str = "./images"):
 
 
 if __name__ == '__main__':
-	main('twice mina', 'firefox')
+	main('twice mina')

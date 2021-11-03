@@ -1,4 +1,5 @@
 import sys, os, re, requests, base64
+from typing import ParamSpec
 from time import altzone, sleep
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -7,10 +8,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
-
+from purser import Purser
 
 # ============================== Constants ==============================
-HTML_CLASS = 'rg_i Q4LuWd'
+SELENIUM_CLASS = 'rg_i Q4LuWd'
+REQUESTS_CLASS = 'yWs4tf'
 # ============================== Constants ==============================
 
 
@@ -40,17 +42,26 @@ def save_base64_image(data, file_path):
 	data = data + '=' * (-len(data) % 4)
 	img = base64.b64decode(data.encode())
 	with open(file_path, "wb") as f:
-			f.write(img)
+		f.write(img)
 
 
-def main(query: str, browser: str = None, save_dir: str = "./images"):
+def main(query: str, browser: str = None, number: int = None, save_dir: str = './images'):
 	url = "https://www.google.com/search?q={}&tbm=isch".format(query)  # tbm=isch does image search
 
-	if browser == None:
+	if save_dir is None:
+		save_dir = './images'
+	
+	if browser is None:
 		html = requests.get(url).content
 		sleep(5)
+
+		# BeautifulSoupを使ってHTMLを解析
+		soup = BeautifulSoup(html, "html.parser")
+		# imgタグを検索
+		img_tags = soup.find_all("img", class_=REQUESTS_CLASS)
+
 	else:
-		print(browser)
+		print('Browser: ', browser)
 		# Launch Selemnium driver
 		if browser == 'chrome':
 			options = webdriver.ChromeOptions()
@@ -76,17 +87,16 @@ def main(query: str, browser: str = None, save_dir: str = "./images"):
 		driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
 		html = driver.page_source.encode("utf-8")
 	
-	# BeautifulSoupを使ってHTMLを解析
-	soup = BeautifulSoup(html, "html.parser")
+		# BeautifulSoupを使ってHTMLを解析
+		soup = BeautifulSoup(html, "html.parser")
+		# imgタグを検索
+		img_tags = soup.find_all("img", class_=SELENIUM_CLASS)
 
-	# imgタグを検索
-	img_tags = soup.find_all("img", class_=HTML_CLASS)
 	print('\nImages found: {}\n'.format(len(img_tags)))
 
 	img_urls = []
 
 	for img_tag in img_tags:
-		print('img_tag:', img_tag)
 		url = img_tag.get("src")
 
 		if url is None:
@@ -94,7 +104,7 @@ def main(query: str, browser: str = None, save_dir: str = "./images"):
 
 		if url is not None:
 			img_urls.append(url)
-			print('url', url)
+			# print('url', url)
 
 
 	os.makedirs(save_dir, exist_ok=True)
@@ -106,6 +116,9 @@ def main(query: str, browser: str = None, save_dir: str = "./images"):
 
 
 	for index, url in enumerate(img_urls):
+		if index == number:  # If number is specified, stop getting images at the point it reaches the number
+			break
+		
 		name = query.replace(" ", "_")
 		file_name = "{}-{}.jpg".format(name, index)
 		# print(file_name)
@@ -122,5 +135,7 @@ def main(query: str, browser: str = None, save_dir: str = "./images"):
 
 if __name__ == '__main__':
 	# args = sys.argv
-	query, browser, save_dir = 'twice mina', 'firefox', None
-	main(query, browser)
+	purser = Purser()
+	args = purser.get_args()
+	# print(args.query, args.browser, args.number, args.save_dir)
+	main(args.query, args.browser, args.number, args.save_dir)
