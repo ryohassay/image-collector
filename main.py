@@ -1,6 +1,5 @@
 import sys, os, re, requests, base64
-from typing import ParamSpec
-from time import altzone, sleep
+from time import sleep
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -16,19 +15,7 @@ REQUESTS_CLASS = 'yWs4tf'
 # ============================== Constants ==============================
 
 
-# Selemnium
-# options = webdriver.ChromeOptions()
-# options = webdriver.FirefoxOptions()
-# options.add_argument('--headless')
-# options.add_argument('--no-sandbox')
-# options.add_argument('--disable-dev-shm-usage')
-# # driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)  # https://pypi.org/project/webdriver-manager/
-# driver = webdriver.Firefox(executable_path=GeckoDriverManager().install(), options=options)
-# driver.implicitly_wait(10)
-
-
 def download_image(url, file_path):
-	""" 画像をダウンロードする関数 """
 	r = requests.get(url, stream=True)
 
 	if r.status_code == 200:
@@ -37,7 +24,7 @@ def download_image(url, file_path):
 
 
 def save_base64_image(data, file_path):
-	""" Base64をデコードして画像に戻す関数 """
+	""" Decodes Base64 to get an image. """
 	# base64の読み込みは4文字ごとに行う。4文字で区切れない部分は「=」で補う
 	data = data + '=' * (-len(data) % 4)
 	img = base64.b64decode(data.encode())
@@ -106,14 +93,10 @@ def main(query: str, browser: str = None, number: int = None, save_dir: str = '.
 			img_urls.append(url)
 			# print('url', url)
 
-
 	os.makedirs(save_dir, exist_ok=True)
 
 	base64_string = "data:image/jpeg;base64,"
-
-	# png画像も対象にする
 	png_base64_string = "data:image/png;base64,"
-
 
 	for index, url in enumerate(img_urls):
 		if index == number:  # If number is specified, stop getting images at the point it reaches the number
